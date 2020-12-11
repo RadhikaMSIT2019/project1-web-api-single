@@ -1,3 +1,4 @@
+//window.onload= function (){
 
 document.getElementById('register').addEventListener('click', e =>{
   let mail = document.forms["myForm"]["email"].value;
@@ -86,6 +87,7 @@ else
   }
 
 });
+//paste from here in console and press enter
 
 
 document.getElementById('searchBooks').addEventListener('click', e =>{
@@ -99,7 +101,8 @@ document.getElementById('searchBooks').addEventListener('click', e =>{
   request.send(null);
 
   request.onload = () => {
-    var data = JSON.parse(request.responseText);
+     var data = JSON.parse(request.responseText);
+     console.log(data);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -120,6 +123,7 @@ function bookdetails(isbn)
   let search = isbn.toString();
   console.log(typeof search);
   let request = new XMLHttpRequest();
+  console.log(request);
   var path = "/api/booksapi/"+search+"/"
   console.log(path);
   request.open("GET", path);
@@ -127,7 +131,8 @@ function bookdetails(isbn)
   request.send();
 
   request.onload = () => {
-    var data = JSON.parse(request.responseText);
+     var data = JSON.parse(request.responseText);
+      console.log(data);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -155,6 +160,7 @@ function review(isbn){
   let search = isbn.toString();
   console.log(typeof search);
   let request = new XMLHttpRequest();
+  console.log(request);
   var path = "/api/reviewsapi/"+search+"/"+reviews+"/"+rating+"/"+email+"/"+fname+"/";
   console.log(path);
   request.open("GET", path);
@@ -163,6 +169,7 @@ function review(isbn){
 
   request.onload = () => {
     var data = JSON.parse(request.responseText);
+    console.log(data);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -172,6 +179,11 @@ function review(isbn){
   }
 }
 
+
+
+
+
+//}
 // document.addEventListener('submit', e =>{
 //   let mail = document.forms["myForm"]["email"].value;
 //   let pwrd = document.forms["myForm"]["password"].value;

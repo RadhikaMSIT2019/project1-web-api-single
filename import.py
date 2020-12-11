@@ -1,7 +1,7 @@
 import csv
 import os
 from flask import Flask, render_template, request, session
-from pymodel import *
+
 from sqlalchemy import create_engine
 from sqlalchemy import Column, String, Integer, DateTime
 from sqlalchemy import or_
