@@ -152,12 +152,13 @@ def registration():
                 # session['email'] = name.email
                 flash('Incorrect password, try again')
                 # s = session['email']
-                return render_template('register.html', email=None)
+                # return render_template('register.html', email=None)
+                return  redirect(url_for('register'))
             else:
                 print('User not registered,register before you login')
                 flash('User not registered,register before you login')
-                # return redirect(url_for('register'))
-                return render_template('register.html', email=None)
+                return redirect(url_for('register'))
+
         except SQLAlchemyError as e:
             print(e)
             return render_template('fail.html', path='./static/css/style.css')
@@ -183,8 +184,9 @@ def registration():
                                 lname=rlname, pwrd=rpassword, date=now)
                     db.add(row)
                     db.commit()
-                    flash('USer successfully registered into DataBase')
-                    return render_template('register.html', email=None)
+                    # flash('USer successfully registered into DataBase')
+                    # return render_template('register.html', email=None)
+                    return render_template('index.html', email=None)
 
             except SQLAlchemyError as e:
                 print(e)
@@ -196,7 +198,9 @@ def registration():
             print("confirmation does not match")
             flash(
                 'confirmation password does not match with the Entered password, Try again')
-            return render_template('register.html', email=None)
+            # return render_template('register.html')
+            return redirect(url_for('register'))
+
 
 
 @app.route("/api/searchapi/<string:search>/", methods=["POST", "GET"])
@@ -207,8 +211,7 @@ def searchapi(search):
         # session['isbn'] = isbn
         # session['title'] = None
         # session['author'] = None
-        query = db.query(Books).filter(
-            or_(Books.isbn.ilike(search), Books.title.ilike(search), Books.author.ilike(search)))
+        query = db.query(Books).filter(or_(Books.isbn.ilike(search), Books.title.ilike(search), Books.author.ilike(search)))
         if query != None:
             row = query.all()
             html = content(row)
@@ -236,7 +239,8 @@ def content(row):
         print(type(r.isbn))
         html += '''<tr>
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.isbn) + '''</a></td>
-          <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.title) + '''</a></td>
+          # changed from r.isbn to r.title for below
+          <td><a onclick="bookdetails(''' + str(r.title) + ''')">''' + str(r.title) + '''</a></td>
         </tr>'''
 
     html += '''</tbody>
@@ -281,14 +285,16 @@ def booksearch(isbn):
                 #     print(f"added{book.title} with number {book.isbn} written by {book.author} published in the year {book.year}")
                 booksquery = db.query(Reviews).filter(Reviews.isbn == isbn)
                 print(booksquery)
+
+                print("from booksapi"+booksquery)
                 res = requests.get("https://www.goodreads.com/book/review_counts.json",
                                    params={"key": "iNR9v978MfG0fz9pCcaFQ", "isbns": isbn})
                 data = res.text
-                print("booksapi data:"+data)
+                print("booksearch of booksapi in  app.py data"+data)
 
                 parsed = json.loads(data)
 
-                print(parsed)
+                print("parsed of booksearch of booksapi in  app.py "+parsed)
                 res = {}
                 for i in parsed:
                     for j in (parsed[i]):
@@ -454,7 +460,7 @@ def book_query(isbn):
 
     except SQLAlchemyError as e:
         print(e)
-        return render_template('fail.html', path='./static/css/styles.min.css')
+        return render_template('fail.html', path='./static/css/styles.css')
     finally:
         db.close()
 
@@ -463,7 +469,7 @@ def book_query(isbn):
 
 @app.route("/login", methods=["POST"])
 def login():
-    return render_template('login.html', path='./static/css/styles.min.css')
+    return render_template('login.html', path='./static/css/styles.css')
 
 
 @app.route("/login_form")

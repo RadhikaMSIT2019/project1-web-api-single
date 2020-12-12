@@ -1,4 +1,3 @@
-//window.onload= function (){
 
 document.getElementById('register').addEventListener('click', e =>{
   let mail = document.forms["myForm"]["email"].value;
@@ -87,10 +86,13 @@ else
   }
 
 });
+
 //paste from here in console and press enter
 
+//'searchBooks' ie boooksearch
 
-document.getElementById('searchBooks').addEventListener('click', e =>{
+var parCounter2 =document.getElementById("searchBooks")
+parCounter2.addEventListener('click', e =>{
   let search = document.getElementById('search').value
   console.log(search);
   let request = new XMLHttpRequest();
