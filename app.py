@@ -3,9 +3,9 @@ import sys
 import requests
 import json
 
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_session import Session
-from datetime import datetime
+from datetime import datetime, time
 
 from sqlalchemy import *  # create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -74,8 +74,8 @@ class Reviews(Base):
 
 
 @app.route("/")
-def index2():
-    return redirect(url_for('home'))
+def index():
+    return render_template('index.html', email=None)
 
 
 @app.route("/home")
@@ -83,19 +83,6 @@ def home():
     if 'email' in session:
         return render_template('index.html', email=session['email'])
     return render_template('base.html', email=None)
-
-
-@app.route("/base")
-def base():
-    return render_template('base.html')
-
-
-@app.route("/index")
-def index():
-    if 'email' in session:
-        return render_template('index.html', email=session['email'])
-    else:
-        return render_template('base.html', email=None)
 
 
 @app.route("/register")
@@ -131,34 +118,31 @@ def registration():
             name = query.first()
             # print(name.email)
             if name is not None and name.email == remail and name.pwrd == rpassword:
-                print('session created in login')
+                print('session created')
                 session['email'] = name.email
                 EmailAccess = name.email
                 Fname = name.fname
                 print("EmailAccess =", EmailAccess, "Fname =", Fname)
                 session['fname'] = name.fname
                 user = name.email
-
                 query = db.query(Admin).filter(Admin.email == remail)
                 name = query.first()
 
                 if name is not None:
                     return redirect(url_for('main', email=user))
 
-                # return render_template('search.html', email=user)
                 return render_template('search.html', email=user, fname=session['fname'])
             elif name is not None and name.email == remail and name.pwrd != rpassword:
                 print('Incorrect password, try again')
                 # session['email'] = name.email
                 flash('Incorrect password, try again')
                 # s = session['email']
-                # return render_template('register.html', email=None)
-                return  redirect(url_for('register'))
+                return redirect(url_for('register'))
             else:
                 print('User not registered,register before you login')
                 flash('User not registered,register before you login')
+                # return redirect(url_for('register'))
                 return redirect(url_for('register'))
-
         except SQLAlchemyError as e:
             print(e)
             return render_template('fail.html', path='./static/css/style.css')
@@ -175,17 +159,14 @@ def registration():
                 if query.first() != None:
                     print('User already exists')
                     flash('User already exists')
-                    return render_template('register.html', email=None)
+                    return redirect(url_for('register'))
                 else:
                     print('Inserting user')
                     now = datetime.now()
                     db = scoped_session(sessionmaker(bind=engine))
-                    row = Users(email=remail, fname=rfname,
-                                lname=rlname, pwrd=rpassword, date=now)
+                    row = Users(email=remail, fname=rfname, lname=rlname, pwrd=rpassword, date=now)
                     db.add(row)
                     db.commit()
-                    # flash('USer successfully registered into DataBase')
-                    # return render_template('register.html', email=None)
                     return render_template('index.html', email=None)
 
             except SQLAlchemyError as e:
@@ -196,11 +177,8 @@ def registration():
                 # return render_template('success.html',path='./static/css/styles.min.css')
         else:
             print("confirmation does not match")
-            flash(
-                'confirmation password does not match with the Entered password, Try again')
-            # return render_template('register.html')
+            flash('confirmation password does not match with the Entered password, Try again')
             return redirect(url_for('register'))
-
 
 
 @app.route("/api/searchapi/<string:search>/", methods=["POST", "GET"])
@@ -211,7 +189,8 @@ def searchapi(search):
         # session['isbn'] = isbn
         # session['title'] = None
         # session['author'] = None
-        query = db.query(Books).filter(or_(Books.isbn.ilike(search), Books.title.ilike(search), Books.author.ilike(search)))
+        query = db.query(Books).filter(
+            or_(Books.isbn.ilike(search), Books.title.ilike(search), Books.author.ilike(search)))
         if query != None:
             row = query.all()
             html = content(row)
@@ -237,7 +216,7 @@ def content(row):
       <tbody>'''
     for r in row:
         print(type(r.isbn))
-        html += '''<tr>
+        html += '''<tr>                                                     
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.isbn) + '''</a></td>
           
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.title) + '''</a></td>
@@ -278,23 +257,21 @@ def booksearch(isbn):
                 Reviews.__table__.create(bind=engine, checkfirst=True)
             # query = db.query(Books).filter(Books.isbn==isbn)
             query = db.query(Books).filter(Books.isbn == isbn)
+            print(query)
             if query != None:
-                # r = query.all()
-                # print(r)
-                # for book in r:
-                #     print(f"added{book.title} with number {book.isbn} written by {book.author} published in the year {book.year}")
+
                 booksquery = db.query(Reviews).filter(Reviews.isbn == isbn)
+
                 print(booksquery)
 
-                print("from booksapi"+booksquery)
                 res = requests.get("https://www.goodreads.com/book/review_counts.json",
-                                   params={"key": "iNR9v978MfG0fz9pCcaFQ", "isbns": isbn})
+                                   params={"key": " iNR9v978MfG0fz9pCcaFQ ", "isbns": isbn})  # aLvwXAjKk7bi8mYKzi0mw
                 data = res.text
-                print("booksearch of booksapi in  app.py data"+data)
+                print("booksearch of booksapi in  app.py data" + data)
 
                 parsed = json.loads(data)
 
-                print("parsed of booksearch of booksapi in  app.py "+parsed)
+                print(parsed)
                 res = {}
                 for i in parsed:
                     for j in (parsed[i]):
@@ -411,7 +388,7 @@ def booksearch(isbn):
 @app.route("/api/reviewsapi/<string:isbn>/<string:review>/<string:rating>/<string:email>/<string:fname>/",
            methods=["GET", "POST"])
 def review(isbn, review, rating, email, fname):
-    print(isbn,review,rating,email,fname);
+    print(isbn, review, rating, email, fname);
     print("inside review")
     print(email)
     now = datetime.now()
@@ -448,7 +425,7 @@ def review(isbn, review, rating, email, fname):
         return html, 200
     except SQLAlchemyError as e:
         print(e)
-        return render_template('fail.html', path='./static/css/styles.min.css')
+        return render_template('fail.html', path='./static/css/style.css')
     finally:
         db.close()
 
@@ -460,7 +437,7 @@ def book_query(isbn):
 
     except SQLAlchemyError as e:
         print(e)
-        return render_template('fail.html', path='./static/css/styles.css')
+        return render_template('fail.html', path='./static/css/style.css')
     finally:
         db.close()
 
@@ -469,7 +446,7 @@ def book_query(isbn):
 
 @app.route("/login", methods=["POST"])
 def login():
-    return render_template('login.html', path='./static/css/styles.css')
+    return render_template('login.html', path='./static/css/style.css')
 
 
 @app.route("/login_form")

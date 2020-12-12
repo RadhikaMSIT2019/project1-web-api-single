@@ -87,12 +87,15 @@ else
 
 });
 
-//paste from here in console and press enter
 
-//'searchBooks' ie boooksearch
 
-var parCounter2 =document.getElementById("searchBooks")
-parCounter2.addEventListener('click', e =>{
+
+
+
+
+
+
+document.getElementById('searchBooks').addEventListener('click', e =>{
   let search = document.getElementById('search').value
   console.log(search);
   let request = new XMLHttpRequest();
@@ -103,8 +106,7 @@ parCounter2.addEventListener('click', e =>{
   request.send(null);
 
   request.onload = () => {
-     var data = JSON.parse(request.responseText);
-     console.log(data);
+    var data = JSON.parse(request.responseText);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -115,7 +117,7 @@ parCounter2.addEventListener('click', e =>{
     }
   };
 
-  // event.preventDefault();
+
   return false;
 });
 
@@ -125,7 +127,6 @@ function bookdetails(isbn)
   let search = isbn.toString();
   console.log(typeof search);
   let request = new XMLHttpRequest();
-  console.log(request);
   var path = "/api/booksapi/"+search+"/"
   console.log(path);
   request.open("GET", path);
@@ -133,8 +134,7 @@ function bookdetails(isbn)
   request.send();
 
   request.onload = () => {
-     var data = JSON.parse(request.responseText);
-      console.log(data);
+    var data = JSON.parse(request.responseText);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -162,7 +162,6 @@ function review(isbn){
   let search = isbn.toString();
   console.log(typeof search);
   let request = new XMLHttpRequest();
-  console.log(request);
   var path = "/api/reviewsapi/"+search+"/"+reviews+"/"+rating+"/"+email+"/"+fname+"/";
   console.log(path);
   request.open("GET", path);
@@ -171,7 +170,6 @@ function review(isbn){
 
   request.onload = () => {
     var data = JSON.parse(request.responseText);
-    console.log(data);
     if (request.status === 200) {
       console.log("request recieved");
       console.log(data);
@@ -180,60 +178,3 @@ function review(isbn){
     }
   }
 }
-
-
-
-
-
-//}
-// document.addEventListener('submit', e =>{
-//   let mail = document.forms["myForm"]["email"].value;
-//   let pwrd = document.forms["myForm"]["password"].value;
-//   let passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&.])[A-Za-z\d$@$!%*?&.]{6, 20}/;
-//   let cmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-
-//   var m = 0;
-
-//   if (!cmail.test(mail)) {
-//     // console.log(mail);
-//     // alert(mail)
-//     document.getElementById('mail-log').innerHTML = "Enter a valid email";
-//     m = 1;
-//   }
-//   else {
-//     document.getElementById('mail-log').innerHTML = "";
-//   }
-
-
-
-//   if (!passw.test(pwrd)) {
-//     // alert(passw.test(pwrd));
-//     // alert(pwrd);
-//     // console.log(passw.test(pwrd));
-//     // console.log(pwrd);
-//     document.getElementById("password-log").innerHTML = "Password should contain atleast one [A-Z],[a-z],[1-0],special characters.";
-//     m=1;
-//   }
-//   else {
-//     document.getElementById('password-log').innerHTML = "";
-//   }
-
-//   if(m!=0)
-//   {
-//     // console.log(m);
-//     // alert(m)
-//     e.preventDefault();
-//   }
-//   else {
-//     return true;
-//   }
-
-// });
-
-// document.addEventListener('DOMContentLoaded',function() {
-//
-// });
-
-// function validateForm() {
-//
-// }
