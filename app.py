@@ -239,8 +239,8 @@ def content(row):
         print(type(r.isbn))
         html += '''<tr>
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.isbn) + '''</a></td>
-          # changed from r.isbn to r.title for below
-          <td><a onclick="bookdetails(''' + str(r.title) + ''')">''' + str(r.title) + '''</a></td>
+          
+          <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.title) + '''</a></td>
         </tr>'''
 
     html += '''</tbody>
