@@ -13,6 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *  # scoped_session, sessionmaker
 from werkzeug.debug import DebuggedApplication
 
+
 app = Flask(__name__)
 
 # Check for environment variable
@@ -240,7 +241,7 @@ def reviewApi():
 
 
 @app.route("/searchtest", methods=["POST", "GET"])
-@app.route("/searchtest")
+
 def searchtest():
     if 'email' in session:
         return render_template('search.html', email=session['email'])
@@ -265,9 +266,9 @@ def booksearch(isbn):
                 print(booksquery)
 
                 res = requests.get("https://www.goodreads.com/book/review_counts.json",
-                                   params={"key": " iNR9v978MfG0fz9pCcaFQ ", "isbns": isbn})  # aLvwXAjKk7bi8mYKzi0mw
+                                   params={"key": "aLvwXAjKk7bi8mYKzi0mw", "isbns": isbn},)  # iNR9v978MfG0fz9pCcaFQ
                 data = res.text
-                print("booksearch of booksapi in  app.py data" + data)
+                print(data)
 
                 parsed = json.loads(data)
 
@@ -444,6 +445,8 @@ def book_query(isbn):
     return bquery.first()
 
 
+
+
 @app.route("/login", methods=["POST"])
 def login():
     return render_template('login.html', path='./static/css/style.css')
@@ -473,6 +476,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # app.secret_key = "#KR#"
+    # app.secret_key = "#RR#"
     app.run(debug=True)
     # Session(app)
