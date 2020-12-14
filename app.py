@@ -33,7 +33,7 @@ Fname = ""
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 # engine = create_engine("postgres://uvzriayrtbengf:003c06b304340ce57dd5f14d97b848b8dcf07ba3c68e7ce9f9144e748dab07de@ec2-54-152-40-168.compute-1.amazonaws.com:5432/d5oa914l0lfkcv")
-# db = scoped_session(sessionmaker(bind=engine))
+db = scoped_session(sessionmaker(bind=engine))
 print(engine.table_names(), file=sys.stdout)
 # db=SQLAlchemy(app)
 
@@ -217,9 +217,9 @@ def content(row):
       <tbody>'''
     for r in row:
         print(type(r.isbn))
-        html += '''<tr>                                                     
+        html += '''<tr>
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.isbn) + '''</a></td>
-          
+
           <td><a onclick="bookdetails(''' + str(r.isbn) + ''')">''' + str(r.title) + '''</a></td>
         </tr>'''
 
@@ -244,7 +244,7 @@ def reviewApi():
 
 def searchtest():
     if 'email' in session:
-        return render_template('search.html', email=session['email'])
+        return render_template('search.html', email=session['email'],fname=session['fname'])
     return render_template('index.html', email=None)
 
 
@@ -267,12 +267,13 @@ def booksearch(isbn):
 
                 res = requests.get("https://www.goodreads.com/book/review_counts.json",
                                    params={"key": "aLvwXAjKk7bi8mYKzi0mw", "isbns": isbn},)  # iNR9v978MfG0fz9pCcaFQ
+
                 data = res.text
                 print(data)
 
                 parsed = json.loads(data)
-
                 print(parsed)
+
                 res = {}
                 for i in parsed:
                     for j in (parsed[i]):
@@ -473,6 +474,10 @@ def main():
             db.close()
     else:
         return render_template('index.html', email=None)
+
+
+
+
 
 
 if __name__ == "__main__":
