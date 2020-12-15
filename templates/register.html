@@ -1,45 +1,41 @@
-{% extends "base.html" %}
-{% block body %}
+{% extends "base.html" %} {% block body %}
 <br>
-<br>
- {% with msg = get_flashed_messages() %}
-          {% if msg %}
-            {% for i in msg %}
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong>{{i}}</strong>
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+<br> {% with msg = get_flashed_messages() %} {% if msg %} {% for i in msg %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{i}}</strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
-            </div>
-        {% endfor %}
-        {% endif %}
-  {% endwith %}
+</div>
+{% endfor %} {% endif %} {% endwith %}
 <div class="signup-form">
-    <form action="{{url_for('registration') }}"   id="myForm" name="myForm" method="post">
-		<h2>Register</h2>
-		<p class="hint-text">Create your account. It's free and only takes a minute.</p>
+    <form action="{{url_for('registration')}}" id="myForm" name="myForm" method="post">
+        <h2>Register</h2>
+        <p class="hint-text">Create your account. It's free and only takes a minute.</p>
         <div class="form-group">
-			<div class="row">
-				<div class="col"><input type="text" class="form-control" name="first_name" placeholder="First Name" required="required"></div>
-				<div class="col"><input type="text" class="form-control" name="last_name" placeholder="Last Name" required="required"></div>
-			</div>
-        </div>
-        <div class="form-group">
-        	<input type="email" class="form-control" name="email" placeholder="Email" required="required">
-        </div>
-		<div class="form-group">
-            <input type="password" class="form-control" name="password" placeholder="Password" required="required">
-        </div>
-		<div class="form-group">
-            <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required="required">
-        </div>
-         <div class="form-group">
+            <div class="row">
+                <div class="col"><input type="text" class="form-control" name="first_name" placeholder="First Name"></div>
+                <div class="col"><input type="text" class="form-control" name="last_name" placeholder="Last Name"></div>
+            </div>
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-success btn-lg btn-block" id="register" name="register" value="Submit" type="submit" value="register">Register</button>
+            <input type="text" class="form-control" name="email" placeholder="Email">
+            <p id="mail-log" class="text-danger"></p>
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-success btn-lg btn-block" id="login" name="login" value="Submit" type="submit" value="login">Login</button>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+            <p id="password-log" class="text-danger"></p>
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password">
+        </div>
+        <div class="form-group">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success btn-lg btn-block" id="register" name="register" value="Submit" type="submit" onsubmit="register_validation()" value="register">Register</button>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success btn-lg btn-block" id="login" name="login" value="Submit" type="submit" onsubmit="login_validation()" value="login">Login</button>
         </div>
     </form>
 </div>

@@ -251,138 +251,157 @@ def searchtest():
 @app.route("/api/booksapi/<string:isbn>/", methods=["POST", "GET"])
 def booksearch(isbn):
     if 'email' in session:
+        print('length of isbn', len(isbn))
+        if len(isbn) != 10:
+            isbn = "0" + isbn
+            booksearch(isbn)
+        print("isbn = ", isbn)
         db = scoped_session(sessionmaker(bind=engine))
+        html = ''
         try:
-            # If table don't exist, Create.
-            if not engine.dialect.has_table(engine, "REVIEWS"):
+            if not engine.dialect.has_table(engine, "REVIEWS"):  # If table don't exist, Create.
                 Reviews.__table__.create(bind=engine, checkfirst=True)
             # query = db.query(Books).filter(Books.isbn==isbn)
             query = db.query(Books).filter(Books.isbn == isbn)
-            print(query)
             if query != None:
-
+                # r = query.all()
+                # print(r)
+                # for book in r:
+                #     print(f"added{book.title} with number {book.isbn} written by {book.author} published in the year {book.year}")
                 booksquery = db.query(Reviews).filter(Reviews.isbn == isbn)
-
                 print(booksquery)
-
                 res = requests.get("https://www.goodreads.com/book/review_counts.json",
-                                   params={"key": "aLvwXAjKk7bi8mYKzi0mw", "isbns": isbn},)  # iNR9v978MfG0fz9pCcaFQ
-
+                                   params={"key": "aLvwXAjKk7bi8mYKzi0mw", "isbns": isbn})
                 data = res.text
                 print(data)
 
-                parsed = json.loads(data)
-                print(parsed)
-
+                # parsed = res.json()
+                # print(parsed)
                 res = {}
-                for i in parsed:
-                    for j in (parsed[i]):
-                        res = j
+                if data != 'No books match those ISBNs.':
+                    parsed = json.loads(data)
+                    print(parsed)
+                    for i in parsed:
+                        for j in (parsed[i]):
+                            res = j
+                else:
+                    res['isbn'] = "_"
+                    res["average_rating"] = "_"
+                    res["reviews_count"] = "_"
+
+                print('res :')
+                print(res)
                 book = query.first()
-                review = booksquery.all()
+                # print('length = ',len(book))
 
-            html = '''
-            <div class="container-fluid">
-            <div class="container">
-            <div class="row">
-            <div class="col-md">
-            <center>
-            <img src="http://covers.openlibrary.org/b/isbn/''' + str(isbn) + '''-L.jpg" class="img-fluid" alt="Responsive image">
-            </center>
-            </div>
-            </div>
-            <div class="row">
-            <div class="col-md">
-            <center>
-            <h1 class="text-uppercase">''' + str(book.title) + '''</h1>
-            </center>
-            </div>
-            </div>
-            <div class="row">
-            <div class="col-sm">
-            <b>ISBN</b>
-            </div>
-            <div class="col-sm">
-            <b>Author</b>
-            </div>
-            <div class="col-sm">
-            <b>Rating</b>
-            </div>
-            <div class="col-sm">
-            <b>Year Published</b>
-            </div>
-            <div class="col-sm">
-            <b>Review Count</b>
-            </div>
-            </div>
-            <div class="row">
-            <div class="col-sm">''' + str(res["isbn"]) + '''
-            </div>
-            <div class="col-sm">''' + str(book.author) + '''
-            </div>
-            <div class="col-sm">''' + str(res["average_rating"]) + '''</div>
-            <div class="col-sm">''' + str(book.year) + '''
-            </div>
-            <div class="col-sm">''' + str(res["reviews_count"]) + '''
-            </div>
-            </div>
-            </div>
-            <hr>
-            <center>
-            <div class="w-50 p-3">
-            <h2>Reviews</h2>
-            <p class="hint-text">Review the book</p>
-            <div class="form-check form-check-inline">
-            <input type="radio" id="star5" name="rating" value="5 Stars" class="form-check-input" />
-            <label for="star5" class="form-check-label" title="text">5 stars</label>
-            </div>
-            <div class="form-check form-check-inline">
-            <input type="radio" id="star4" name="rating" value="4 Stars" class="form-check-input" />
-            <label for="star4" class="form-check-label" title="text">4 stars</label>
-            </div>
-            <div class="form-check form-check-inline">
-            <input type="radio" id="star3" name="rating" value="3 Stars" class="form-check-input" />
-            <label for="star3" class="form-check-label" title="text">3 stars</label>
-            </div>
-            <div class="form-check form-check-inline">
-            <input type="radio" id="star2" name="rating" value="2 Stars" class="form-check-input" />
-            <label for="star2" class="form-check-label" title="text">2 stars</label>
-            </div>
-            <div class="form-check form-check-inline">
-            <input type="radio" id="star1" name="rating" value="1 Star" class="form-check-input" />
-            <label for="star1" class="form-check-label" title="text">1 star</label>
-            </div>
-            <div class="form-group">
-            <textarea id="Review" name="review" placeholder="Write your review.." class="form-control"></textarea>
-            </div>
-            <div class="form-group">
-            <button type="submit" class="btn btn-success btn-lg btn-block" name="login" value="login" id="Reviewbtn" onclick="review(''' + str(
-                isbn) + ''')">submit</button>
-            </div>
-            </div>
-            </center>'''
-            if review != None:
-                for i in review:
-                    html += ''' <div style="background:#faf3dd" class="jumbotron jumbotron-fluid .bg-gradient-primary">
-                    <div class="container .bg-gradient-primary">
-                    <h1 class="display-8"><b>''' + str(i.fname) + '''</b></h1>
-                    <p class="lead">''' + str(i.date) + '''<br>
-                    ''' + str(i.review) + '''</p>
-                    </div>
-                    </div>
-                    </div>'''
+                html = '''
+                       <div class="container-fluid">
+                       <div class="container">
+                       <div class="row">
+                       <div class="col-md">
+                       <center>
+                       <img src="http://covers.openlibrary.org/b/isbn/''' + str(isbn) + '''-L.jpg" class="img-fluid" alt="Responsive image">
+                       </center>
+                       </div>
+                       </div>
+                       <div class="row">
+                       <div class="col-md">
+                       <center>
+                       <h1 class="text-uppercase">''' + str(book.title) + '''</h1>
+                       </center>
+                       </div>
+                       </div>
+                       <div class="row">
+                       <div class="col-sm">
+                       <b>ISBN</b>
+                       </div>
+                       <div class="col-sm">
+                       <b>Author</b>
+                       </div>
+                       <div class="col-sm">
+                       <b>Rating</b>
+                       </div>
+                       <div class="col-sm">
+                       <b>Year Published</b>
+                       </div>
+                       <div class="col-sm">
+                       <b>Review Count</b>
+                       </div>
+                       </div>
+                       <div class="row">
+                       <div class="col-sm">''' + str(res["isbn"]) + '''
+                       </div>
+                       <div class="col-sm">''' + str(book.author) + '''
+                       </div>
+                       <div class="col-sm">''' + str(res["average_rating"]) + '''</div>
+                       <div class="col-sm">''' + str(book.year) + '''
+                       </div>
+                       <div class="col-sm">''' + str(res["reviews_count"]) + '''
+                       </div>
+                       </div>
+                       </div>
+                       <hr>
+                       <center>
+                       <div class="w-50 p-3">
+                       <h2>Reviews</h2>
+                       <p class="hint-text">Review the book</p>
+                       <div class="form-check form-check-inline">
+                       <input type="radio" id="star5" name="rating" value="5 Stars" class="form-check-input" />
+                       <label for="star5" class="form-check-label" title="text">5 stars</label>
+                       </div>
+                       <div class="form-check form-check-inline">
+                       <input type="radio" id="star4" name="rating" value="4 Stars" class="form-check-input" />
+                       <label for="star4" class="form-check-label" title="text">4 stars</label>
+                       </div>
+                       <div class="form-check form-check-inline">
+                       <input type="radio" id="star3" name="rating" value="3 Stars" class="form-check-input" />
+                       <label for="star3" class="form-check-label" title="text">3 stars</label>
+                       </div>
+                       <div class="form-check form-check-inline">
+                       <input type="radio" id="star2" name="rating" value="2 Stars" class="form-check-input" />
+                       <label for="star2" class="form-check-label" title="text">2 stars</label>
+                       </div>
+                       <div class="form-check form-check-inline">
+                       <input type="radio" id="star1" name="rating" value="1 Star" class="form-check-input" />
+                       <label for="star1" class="form-check-label" title="text">1 star</label>
+                       </div>
+                       <div class="form-group">
+                       <textarea id="Review" name="review" placeholder="Write your review.." class="form-control"></textarea>
+                       </div>
+                       <div class="form-group">
+                       <button type="submit" class="btn btn-success btn-lg btn-block" name="login" value="login" id="Reviewbtn" onclick="review(''' + str(
+                    isbn) + ''')">submit</button>
+                       </div>
+                       </div>
+                       </center>'''
+                if booksquery != None:
+                    review = booksquery.all()
+                    if review != None:
+                        for i in review:
+                            html += ''' <div style="background:#faf3dd" class="jumbotron jumbotron-fluid .bg-gradient-primary">
+                                   <div class="container .bg-gradient-primary">
+                                   <h1 class="display-8"><b>''' + str(i.fname) + '''</b></h1>
+                                   <p class="lead">''' + str(i.date) + '''<br>
+                                   ''' + str(i.review) + '''</p>
+                                   </div>
+                                   </div>
+                                   </div>'''
 
-            else:
-                html = "<p>there are no books available for this book</p>"
-
-            html = json.dumps({'content': html})
-            return html, 200
+                    else:
+                        html = "<p>there are no books available for this book</p>"
+                print('returning html')
+                html = json.dumps({'content': html})
+                return html, 200
 
         except SQLAlchemyError as e:
             print(e)
             return '<p>No Results found for the selected book</p>', 400
+        except Exception as e:
+            print(e)
         finally:
             db.close()
+        # print('html :',html)
+        # return html,200
     else:
         return render_template('index.html', email=None)
 
