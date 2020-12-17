@@ -411,12 +411,10 @@ def booksearch(isbn):
 @app.route("/api/reviewsapi/<string:isbn>/<string:review>/<string:rating>/<string:email>/<string:fname>/",
            methods=["GET", "POST"])
 def review(isbn, review, rating, email, fname):
-    print('length of isbn',len(isbn))
-    if len(isbn)!=10:
-        isbn = "0"+isbn
-        review(isbn, review, rating, email, fname)
-    print("isbn = ",isbn)
-
+    print('review length of isbn', len(isbn))
+    while len(isbn) < 10:
+        isbn = "0" + isbn
+    print("review isbn = ", isbn)
 
     print(isbn, review, rating, email, fname);
     print("inside review")
