@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "BOOKS" (
-    "isbn" TEXT,
+    "isbn" TEXT PRIMARY KEY,
     "title" TEXT,
     "author" TEXT,
     "year" INT

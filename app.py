@@ -40,6 +40,7 @@ print(engine.table_names(), file=sys.stdout)
 Base = declarative_base()
 
 
+
 class Users(Base):
     __tablename__ = "USERS"
     email = Column(String, primary_key=True, nullable=False)
@@ -250,13 +251,14 @@ def searchtest():
 
 @app.route("/api/booksapi/<string:isbn>/", methods=["POST", "GET"])
 def booksearch(isbn):
+    db = scoped_session(sessionmaker(bind=engine))
     if 'email' in session:
         print('length of isbn', len(isbn))
         if len(isbn) != 10:
             isbn = "0" + isbn
             booksearch(isbn)
         print("isbn = ", isbn)
-        db = scoped_session(sessionmaker(bind=engine))
+
         html = ''
         try:
             if not engine.dialect.has_table(engine, "REVIEWS"):  # If table don't exist, Create.
@@ -409,6 +411,13 @@ def booksearch(isbn):
 @app.route("/api/reviewsapi/<string:isbn>/<string:review>/<string:rating>/<string:email>/<string:fname>/",
            methods=["GET", "POST"])
 def review(isbn, review, rating, email, fname):
+    print('length of isbn',len(isbn))
+    if len(isbn)!=10:
+        isbn = "0"+isbn
+        review(isbn, review, rating, email, fname)
+    print("isbn = ",isbn)
+
+
     print(isbn, review, rating, email, fname);
     print("inside review")
     print(email)
@@ -442,7 +451,9 @@ def review(isbn, review, rating, email, fname):
             db.commit()
             html = '<center><p class="fs-1">Review Submitted</p></center>'
 
+        print("html=",html)
         html = json.dumps({'content': html})
+
         return html, 200
     except SQLAlchemyError as e:
         print(e)
