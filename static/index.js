@@ -1,6 +1,6 @@
 
 
-//ctrl+Shift+R   use this when js changes are made
+//ctrl+Shift+R   use this for reloading js files in browser which is a must
 
 document.getElementById('register').addEventListener('click', e =>{
   let mail = document.forms["myForm"]["email"].value;
@@ -139,6 +139,7 @@ function bookdetails(isbn)
   console.log(path);
   request.open("GET", path);
   request.setRequestHeader("Content-Type", "application/json");
+
   request.send();
 
   request.onload = () => {
@@ -151,6 +152,9 @@ function bookdetails(isbn)
     }
   }
 }
+
+
+
 
 function review(isbn){
   var ele = document.getElementsByName('rating');

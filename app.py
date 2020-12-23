@@ -188,9 +188,6 @@ def searchapi(search):
     try:
         db = scoped_session(sessionmaker(bind=engine))
         search = '%' + search + '%'
-        # session['isbn'] = isbn
-        # session['title'] = None
-        # session['author'] = None
         query = db.query(Books).filter(
             or_(Books.isbn.ilike(search), Books.title.ilike(search), Books.author.ilike(search)))
         if query != None:
@@ -205,7 +202,6 @@ def searchapi(search):
         return '<p>No Results found for the entered details</p>', 400
     finally:
         db.close()
-
 
 def content(row):
     html = '''<table class="table">
@@ -231,9 +227,13 @@ def content(row):
     return html
 
 
+
+
 @app.route("/bookApi")
 def bookApi():
     pass
+
+
 
 
 @app.route("/reviewApi")
@@ -241,22 +241,21 @@ def reviewApi():
     pass
 
 
-@app.route("/searchtest", methods=["POST", "GET"])
 
+@app.route("/searchtest", methods=["POST", "GET"])
 def searchtest():
     if 'email' in session:
         return render_template('search.html', email=session['email'],fname=session['fname'])
     return render_template('index.html', email=None)
-
 
 @app.route("/api/booksapi/<string:isbn>/", methods=["POST", "GET"])
 def booksearch(isbn):
     db = scoped_session(sessionmaker(bind=engine))
     if 'email' in session:
         print('length of isbn', len(isbn))
-        if len(isbn) != 10:
+        if len(isbn)<10:
             isbn = "0" + isbn
-            booksearch(isbn)
+            # booksearch(isbn)
         print("isbn = ", isbn)
 
         html = ''
@@ -294,7 +293,7 @@ def booksearch(isbn):
                 print('res :')
                 print(res)
                 book = query.first()
-                # print('length = ',len(book))
+
 
                 html = '''
                        <div class="container-fluid">
@@ -411,20 +410,26 @@ def booksearch(isbn):
 @app.route("/api/reviewsapi/<string:isbn>/<string:review>/<string:rating>/<string:email>/<string:fname>/",
            methods=["GET", "POST"])
 def review(isbn, review, rating, email, fname):
+    # print('review length of isbn', len(isbn))
+    # while len(isbn) < 10:
+    #     isbn = "0" + isbn
+    # print("review isbn = ", isbn)
+    #
+    # print(isbn, review, rating, email, fname);
+    # print("inside review")
+    # print(email)
+    # now = datetime.now()
+    # print(fname)
+    print("inside review")
+    print(email)
+    now = datetime.now()
+    print(fname)
+
     print('review length of isbn', len(isbn))
     while len(isbn) < 10:
         isbn = "0" + isbn
     print("review isbn = ", isbn)
 
-    print(isbn, review, rating, email, fname);
-    print("inside review")
-    print(email)
-    now = datetime.now()
-    print(fname)
-    # author = session['author']
-    # print("author =",session['author'])
-    # title = session['title']
-    # print("title =",session['title'])
     try:
         db = scoped_session(sessionmaker(bind=engine))
         query = db.query(Reviews).filter(Reviews.email == email)
@@ -451,7 +456,6 @@ def review(isbn, review, rating, email, fname):
 
         print("html=",html)
         html = json.dumps({'content': html})
-
         return html, 200
     except SQLAlchemyError as e:
         print(e)
